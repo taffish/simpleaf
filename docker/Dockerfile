@@ -4,10 +4,10 @@ ARG RUST_VERSION=1.96.0
 FROM rust:${RUST_VERSION}-slim-bookworm AS alevin-fry-builder
 
 ARG RUST_VERSION
-ARG ALEVIN_FRY_VERSION=0.16.2
-ARG ALEVIN_FRY_TAG=v0.16.2
-ARG ALEVIN_FRY_COMMIT=d812531ef1c5fd22efec98cfc26b6f443b138650
-ARG ALEVIN_FRY_SOURCE_SHA256=07882d18f594b071cfed3cebb36e723c157ba20a1255b1e48ac1000b4892d944
+ARG ALEVIN_FRY_VERSION=0.17.1
+ARG ALEVIN_FRY_TAG=v0.17.1
+ARG ALEVIN_FRY_COMMIT=9c82c0ba8432ceea18d25089833d82cc5950fb59
+ARG ALEVIN_FRY_SOURCE_SHA256=c88ec6cf65a601fc75a2842780fe25cb6116a5e024bcf1d92d89f3aec4043828
 ARG TARGETARCH
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -64,12 +64,12 @@ RUN set -eux; \
 FROM rust:${RUST_VERSION}-slim-bookworm AS piscem-builder
 
 ARG RUST_VERSION
-ARG PISCEM_VERSION=0.21.1
-ARG PISCEM_TAG=v0.21.1
-ARG PISCEM_COMMIT=f9c6f44b42ea6fe71557d005c01cf3feb7c1dfa0
-ARG PISCEM_SOURCE_SHA256=6ac6646b13a842c2c0559d1dd63771e68b4ee5844f8426b020adb9412baf9003
-ARG PACKED_SEQ_VERSION=4.4.2
-ARG PACKED_SEQ_SHA256=dfb66483c3186c6582f3046d6ec8cd5e9e4db8039f6bd3ca60dce3f895b6a56c
+ARG PISCEM_VERSION=0.22.0
+ARG PISCEM_TAG=v0.22.0
+ARG PISCEM_COMMIT=7a0228a3758ef8faf92a2d3847740cd59953a56c
+ARG PISCEM_SOURCE_SHA256=dfb1016fbffd98076c5e0515ed2306144f08e22ed062f117d60cf4933d99a4a2
+ARG PACKED_SEQ_VERSION=5.0.0
+ARG PACKED_SEQ_SHA256=5a3a89b413dff56614047583dad3cc5c4a61ad16a436a578dfaf8c214e98734a
 ARG TARGETARCH
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -103,13 +103,13 @@ RUN set -eux; \
         cpu_mode='scalar'; \
         grep -Fx 'mimalloc = "0.1"' Cargo.toml >/dev/null; \
         if grep -F 'packed-seq = ' Cargo.toml >/dev/null; then exit 1; fi; \
-        sed -i '/^mimalloc = "0.1"$/a packed-seq = { version = "=4.4.2", features = ["scalar"] }' \
+        sed -i '/^mimalloc = "0.1"$/a packed-seq = { version = "=5.0.0", features = ["scalar"] }' \
             Cargo.toml; \
-        grep -Fx 'packed-seq = { version = "=4.4.2", features = ["scalar"] }' \
+        grep -Fx 'packed-seq = { version = "=5.0.0", features = ["scalar"] }' \
             Cargo.toml >/dev/null; \
         if sed -n '/^name = "piscem"$/,/^]$/p' Cargo.lock | \
             grep -Fx ' "packed-seq",' >/dev/null; then exit 1; fi; \
-        sed -i '/^name = "piscem"$/,/^]$/s/^ "num_cpus",$/ "num_cpus",\n "packed-seq",/' \
+        sed -i '/^name = "piscem"$/,/^]$/s/^ "mimalloc",$/ "mimalloc",\n "packed-seq",/' \
             Cargo.lock; \
         sed -n '/^name = "piscem"$/,/^]$/p' Cargo.lock | \
             grep -Fx ' "packed-seq",' >/dev/null \
@@ -151,20 +151,20 @@ RUN set -eux; \
 
 FROM debian:12-slim AS rust-assets
 
-ARG SIMPLEAF_VERSION=0.26.2
-ARG SIMPLEAF_TAG=v0.26.2
-ARG SIMPLEAF_COMMIT=7fbc1ad0531df03e71888ed1a3ada98a8841d630
-ARG SIMPLEAF_SOURCE_SHA256=b4606e5b6c3d64f9b02a528964d17f69f8715622b988596a1a13f129c1e9bc06
-ARG SIMPLEAF_AMD64_SHA256=dcf9ce35159602c790c6a211118c7e35719f2975f6a439d2a5b23378d45076bf
-ARG SIMPLEAF_ARM64_SHA256=b2328a0c38d6cd50a1e92db54ed70d3419962ce33d906db5be5d53a8ff851284
-ARG PISCEM_VERSION=0.21.1
-ARG PISCEM_TAG=v0.21.1
-ARG PISCEM_COMMIT=f9c6f44b42ea6fe71557d005c01cf3feb7c1dfa0
-ARG PISCEM_SOURCE_SHA256=6ac6646b13a842c2c0559d1dd63771e68b4ee5844f8426b020adb9412baf9003
-ARG ALEVIN_FRY_VERSION=0.16.2
-ARG ALEVIN_FRY_TAG=v0.16.2
-ARG ALEVIN_FRY_COMMIT=d812531ef1c5fd22efec98cfc26b6f443b138650
-ARG ALEVIN_FRY_SOURCE_SHA256=07882d18f594b071cfed3cebb36e723c157ba20a1255b1e48ac1000b4892d944
+ARG SIMPLEAF_VERSION=0.27.0
+ARG SIMPLEAF_TAG=v0.27.0
+ARG SIMPLEAF_COMMIT=e4713d6ec2127426a0198c3e6ba1ce3dd25bd1fa
+ARG SIMPLEAF_SOURCE_SHA256=cecb53f84d81cb8d07a1782661edc7f97d177ca7255660e816d854529410e56f
+ARG SIMPLEAF_AMD64_SHA256=a50ab007e20005426d6fccb484855afbea70c9d55818e9ec5878b15f44c8d3e8
+ARG SIMPLEAF_ARM64_SHA256=a275add8b54080df342ee00449114e36057e6741eb3ba36c6865fc06f090e42b
+ARG PISCEM_VERSION=0.22.0
+ARG PISCEM_TAG=v0.22.0
+ARG PISCEM_COMMIT=7a0228a3758ef8faf92a2d3847740cd59953a56c
+ARG PISCEM_SOURCE_SHA256=dfb1016fbffd98076c5e0515ed2306144f08e22ed062f117d60cf4933d99a4a2
+ARG ALEVIN_FRY_VERSION=0.17.1
+ARG ALEVIN_FRY_TAG=v0.17.1
+ARG ALEVIN_FRY_COMMIT=9c82c0ba8432ceea18d25089833d82cc5950fb59
+ARG ALEVIN_FRY_SOURCE_SHA256=c88ec6cf65a601fc75a2842780fe25cb6116a5e024bcf1d92d89f3aec4043828
 ARG PROTOCOL_ESTUARY_COMMIT=3476e9fceca173cf8f31e1b921bf4d6fb409eb3c
 ARG PROTOCOL_ESTUARY_SHA256=3803492f80b36b85ff39267673f9d392032d4f862371c539949d3c50984c6a49
 ARG TARGETARCH
@@ -222,7 +222,7 @@ RUN set -eux; \
     install -Dm0644 simpleaf-source/CHANGELOG.md /opt/simpleaf/share/doc/simpleaf/CHANGELOG.md; \
     install -Dm0644 simpleaf-source/resources/chemistries.json /opt/simpleaf/home/chemistries.json; \
     test "$(sha256sum /opt/simpleaf/home/chemistries.json | awk '{print $1}')" = \
-        "4000cfe03fca62ecab4a6c64d7b0e38c8264017bae69b64afb030c3ffaab20d6"; \
+        "85d4ec8918f971787a28f59e05a037930f0090086bd7f406cbc3fc8d145ccc35"; \
     curl --retry 5 --retry-delay 2 --retry-all-errors -fsSL \
         "https://github.com/COMBINE-lab/protocol-estuary/archive/${PROTOCOL_ESTUARY_COMMIT}.tar.gz" \
         -o protocol-estuary.tar.gz; \
@@ -263,7 +263,7 @@ RUN set -eux; \
       printf 'linux_amd64_asset_sha256=%s\n' "${SIMPLEAF_AMD64_SHA256}"; \
       printf 'linux_arm64_asset_sha256=%s\n' "${SIMPLEAF_ARM64_SHA256}"; \
       printf 'source_archive_sha256=%s\n' "${SIMPLEAF_SOURCE_SHA256}"; \
-      printf 'chemistry_registry_sha256=4000cfe03fca62ecab4a6c64d7b0e38c8264017bae69b64afb030c3ffaab20d6\n'; \
+      printf 'chemistry_registry_sha256=85d4ec8918f971787a28f59e05a037930f0090086bd7f406cbc3fc8d145ccc35\n'; \
       printf 'protocol_estuary_commit=%s\n' "${PROTOCOL_ESTUARY_COMMIT}"; \
       printf 'protocol_estuary_archive_sha256=%s\n' "${PROTOCOL_ESTUARY_SHA256}"; \
       printf 'piscem_version=%s\n' "${PISCEM_VERSION}"; \
@@ -367,9 +367,9 @@ RUN set -eux; \
 
 FROM python:${PYTHON_VERSION}-slim-bookworm
 
-ARG SIMPLEAF_VERSION=0.26.2
-ARG PISCEM_VERSION=0.21.1
-ARG ALEVIN_FRY_VERSION=0.16.2
+ARG SIMPLEAF_VERSION=0.27.0
+ARG PISCEM_VERSION=0.22.0
+ARG ALEVIN_FRY_VERSION=0.17.1
 ARG MACS3_VERSION=3.0.4
 ARG TARGETARCH
 ARG BUILDARCH

@@ -1,4 +1,4 @@
-simpleaf 0.26.2-r1
+simpleaf 0.27.0-r1
 
 Purpose:
   Build single-cell references, map and quantify sc/snRNA-seq, process
@@ -23,7 +23,7 @@ Main subcommands:
 
 Direct reference index:
   taf-simpleaf simpleaf index \
-    --ref-seq transcripts.fa --output index-out --threads 8
+    --ref-seq transcripts.fa --output index-out --threads 8 --ram-limit-gib 8
 
 Splici index:
   taf-simpleaf simpleaf index \
@@ -34,8 +34,8 @@ Paired 10x quantification:
   taf-simpleaf simpleaf quant \
     --chemistry 10xv3 --index index-out/index \
     --reads1 sample_R1.fastq.gz --reads2 sample_R2.fastq.gz \
-    --output sample-quant --threads 8 \
-    --unfiltered-pl barcodes.txt --resolution cr-like-em
+    --output sample-quant --threads 8 --decoder auto --with-position \
+    --unfiltered-pl barcodes.txt --resolution cr-like-em --small-thresh 0
 
 Permit lists:
   Use one of --knee, --expect-cells, --forced-cells, --explicit-pl, or
@@ -49,7 +49,7 @@ Other interfaces:
   taf-simpleaf simpleaf workflow run --manifest workflow.json
 
 Bundled runtime:
-  simpleaf 0.26.2, piscem 0.21.1, alevin-fry 0.16.2, MACS3 3.0.4,
+  simpleaf 0.27.0, piscem 0.22.0, alevin-fry 0.17.1, MACS3 3.0.4,
   the tagged chemistry registry, and a pinned protocol-estuary snapshot.
   Native linux/amd64 and linux/arm64 images; CPU only. Companion commands:
   taf-simpleaf piscem --version
@@ -71,8 +71,8 @@ Workflow boundary:
   tools are present; custom dependencies are not inferred.
 
 Performance:
-  Use --threads, local --work-dir scratch, and 2048+ file descriptors. Generic
-  amd64 piscem favors compatibility over AVX2 tuning; arm64 uses baseline NEON.
+  --threads is shared by mapping and gzip decoding; index RAM defaults to 8 GiB.
+  Use --tmp-dir/--work-dir scratch. amd64 is scalar; arm64 uses baseline NEON.
 
 Key outputs:
   index_info.json, simpleaf_index_log.json, index/simpleaf_index.json
@@ -80,7 +80,7 @@ Key outputs:
 
 Documentation:
   https://github.com/taffish/simpleaf
-  https://simpleaf.readthedocs.io/en/latest/
+  https://combine-lab.github.io/simpleaf/
   https://combine-lab.github.io/alevin-fry-tutorials/
 Wrapper options:
   taf-simpleaf --help       Show this TAFFISH help.

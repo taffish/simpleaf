@@ -5,9 +5,9 @@ SIMPLEAF=/opt/simpleaf/bin/simpleaf
 PISCEM=/opt/simpleaf/bin/piscem
 ALEVIN_FRY=/opt/simpleaf/bin/alevin-fry
 MACS3=/opt/simpleaf/macs3/bin/macs3
-EXPECTED_SIMPLEAF=0.26.2
-EXPECTED_PISCEM=0.21.1
-EXPECTED_ALEVIN_FRY=0.16.2
+EXPECTED_SIMPLEAF=0.27.0
+EXPECTED_PISCEM=0.22.0
+EXPECTED_ALEVIN_FRY=0.17.1
 EXPECTED_MACS3=3.0.4
 MODE=${1:-}
 TMP_ROOT=${2:-/tmp}
@@ -51,29 +51,35 @@ identity_check() {
         fail "unexpected alevin-fry version"
     "$MACS3" --version 2>&1 | grep -F "$EXPECTED_MACS3" >/dev/null
     RUST_LOG=warn "$SIMPLEAF" inspect >"${TMP_ROOT%/}/simpleaf-inspect-$$.json" 2>&1
-    grep -F '"simpleaf_version": "0.26.2"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
-    grep -F '"version": "0.21.1"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
-    grep -F '"version": "0.16.2"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
+    grep -F '"simpleaf_version": "0.27.0"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
+    grep -F '"version": "0.22.0"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
+    grep -F '"version": "0.17.1"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
     grep -F '"version": "3.0.4"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
-    grep -Fx 'upstream_commit=7fbc1ad0531df03e71888ed1a3ada98a8841d630' \
+    grep -Fx 'upstream_commit=e4713d6ec2127426a0198c3e6ba1ce3dd25bd1fa' \
+        /opt/simpleaf/share/doc/simpleaf/source.txt >/dev/null
+    grep -Fx 'linux_amd64_asset_sha256=a50ab007e20005426d6fccb484855afbea70c9d55818e9ec5878b15f44c8d3e8' \
+        /opt/simpleaf/share/doc/simpleaf/source.txt >/dev/null
+    grep -Fx 'linux_arm64_asset_sha256=a275add8b54080df342ee00449114e36057e6741eb3ba36c6865fc06f090e42b' \
+        /opt/simpleaf/share/doc/simpleaf/source.txt >/dev/null
+    grep -Fx 'chemistry_registry_sha256=85d4ec8918f971787a28f59e05a037930f0090086bd7f406cbc3fc8d145ccc35' \
         /opt/simpleaf/share/doc/simpleaf/source.txt >/dev/null
     grep -Fx 'protocol_estuary_commit=3476e9fceca173cf8f31e1b921bf4d6fb409eb3c' \
         /opt/simpleaf/share/doc/simpleaf/source.txt >/dev/null
-    grep -Fx 'upstream_version=0.16.2' \
+    grep -Fx 'upstream_version=0.17.1' \
         /opt/simpleaf/share/doc/alevin-fry/source.txt >/dev/null
     grep -Fx 'runtime_source=official source archive build' \
         /opt/simpleaf/share/doc/alevin-fry/source.txt >/dev/null
     grep -Fx 'cargo_locked=yes' \
         /opt/simpleaf/share/doc/alevin-fry/source.txt >/dev/null
-    grep -Fx 'upstream_version=0.21.1' \
+    grep -Fx 'upstream_version=0.22.0' \
         /opt/simpleaf/share/doc/piscem/source.txt >/dev/null
     grep -Fx 'runtime_source=official source archive build' \
         /opt/simpleaf/share/doc/piscem/source.txt >/dev/null
     grep -Fx 'cargo_locked=yes' \
         /opt/simpleaf/share/doc/piscem/source.txt >/dev/null
-    grep -Fx 'packed_seq_version=4.4.2' \
+    grep -Fx 'packed_seq_version=5.0.0' \
         /opt/simpleaf/share/doc/piscem/source.txt >/dev/null
-    grep -Fx 'packed_seq_crate_sha256=dfb66483c3186c6582f3046d6ec8cd5e9e4db8039f6bd3ca60dce3f895b6a56c' \
+    grep -Fx 'packed_seq_crate_sha256=5a3a89b413dff56614047583dad3cc5c4a61ad16a436a578dfaf8c214e98734a' \
         /opt/simpleaf/share/doc/piscem/source.txt >/dev/null
     case "$(uname -m)" in
         x86_64)
@@ -129,12 +135,24 @@ interfaces_check() {
     help_file="${TMP_ROOT%/}/taf-simpleaf-help-$$.txt"
     check_help 'multiplex-quant' "$SIMPLEAF"
     check_help '--probe-csv' "$SIMPLEAF" index
+    check_help '--tmp-dir' "$SIMPLEAF" index
+    check_help '--ram-limit-gib' "$SIMPLEAF" index
     check_help '--anndata-out' "$SIMPLEAF" quant
+    check_help '--decoder' "$SIMPLEAF" quant
+    check_help '--thread-policy' "$SIMPLEAF" quant
+    check_help '--with-position' "$SIMPLEAF" quant
+    check_help '--small-thresh' "$SIMPLEAF" quant
     check_help '--sample-bc-list' "$SIMPLEAF" multiplex-quant
+    check_help '--sample-bc-ori' "$SIMPLEAF" multiplex-quant
+    check_help '--small-thresh' "$SIMPLEAF" multiplex-quant
     check_help 'lookup' "$SIMPLEAF" chemistry
     check_help 'process' "$SIMPLEAF" atac
     check_help '--work-dir' "$SIMPLEAF" atac index
+    check_help '--ram-limit-gib' "$SIMPLEAF" atac index
     check_help '--call-peaks' "$SIMPLEAF" atac process
+    check_help '--decoder' "$SIMPLEAF" atac process
+    check_help '--thread-policy' "$SIMPLEAF" atac process
+    check_help '--barcode-length' "$SIMPLEAF" atac process
     check_help 'patch' "$SIMPLEAF" workflow
     check_help '--manifest' "$SIMPLEAF" workflow run
     check_help 'map-sc' "$PISCEM"
@@ -147,6 +165,11 @@ registry_check() {
     new_workdir
     RUST_LOG=warn "$SIMPLEAF" chemistry lookup --name 10xv3 >"$work/chemistry.json"
     grep -F '1{b[16]u[12]x:}2{r:}' "$work/chemistry.json" >/dev/null
+    RUST_LOG=warn "$SIMPLEAF" chemistry lookup \
+        --name 10x-flexv2-gex-3p-config-b >"$work/flexv2-chemistry.json"
+    grep -F 'CCCATATAAGAAAACCTGAATACGCGGTT' "$work/flexv2-chemistry.json" >/dev/null
+    grep -F '737K-flex-v2.txt' "$work/flexv2-chemistry.json" >/dev/null
+    grep -F '"sample_bc_ori": "forward"' /opt/simpleaf/home/chemistries.json >/dev/null
     RUST_LOG=warn "$SIMPLEAF" workflow list >"$work/workflows.txt"
     grep -F 'simpleaf-index' "$work/workflows.txt" >/dev/null
     RUST_LOG=warn "$SIMPLEAF" workflow get \
@@ -162,12 +185,15 @@ registry_check() {
 
 index_check() {
     new_workdir
+    mkdir -p "$work/rna-tmp" "$work/atac-tmp"
     run_logged "$work/index.log" "$SIMPLEAF" index \
         --ref-seq "$work/ref.fa" \
         --output "$work/rna-index" \
         --threads 1 \
         --kmer-length 21 \
         --minimizer-length 15 \
+        --tmp-dir "$work/rna-tmp" \
+        --ram-limit-gib 1 \
         --dict tiny
     test -s "$work/rna-index/index/piscem_idx.ctab"
     test -s "$work/rna-index/index/piscem_idx.refinfo"
@@ -180,7 +206,9 @@ index_check() {
         --work-dir "$work/atac-work" \
         --threads 1 \
         --kmer-length 21 \
-        --minimizer-length 15
+        --minimizer-length 15 \
+        --tmp-dir "$work/atac-tmp" \
+        --ram-limit-gib 1
     test -s "$work/atac-index/index/piscem_idx.ctab"
     test -s "$work/atac-index/index/simpleaf_index.json"
     grep -F 'piscem build' "$work/atac-index/index/simpleaf_index.json" >/dev/null
@@ -205,6 +233,10 @@ quant_check() {
         --reads2 "$work/reads2.fastq" \
         --explicit-pl "$work/permit.txt" \
         --t2g-map "$work/t2g.tsv" \
+        --decoder serial \
+        --thread-policy "$work/thread-policy.json" \
+        --with-position \
+        --small-thresh 0 \
         --resolution cr-like \
         --dict tiny
     test -s "$work/quant/af_map/map.rad"
@@ -217,6 +249,9 @@ quant_check() {
     grep -Fx 'geneB' "$work/quant/af_quant/alevin/quants_mat_cols.txt" >/dev/null
     grep -F 'piscem map-sc' "$work/quant/simpleaf_quant_log.json" >/dev/null
     grep -F 'alevin-fry quant' "$work/quant/simpleaf_quant_log.json" >/dev/null
+    grep -F -- '--decoder serial' "$work/quant/simpleaf_quant_log.json" >/dev/null
+    grep -F -- '--with-position' "$work/quant/simpleaf_quant_log.json" >/dev/null
+    grep -F -- '--small-thresh 0' "$work/quant/simpleaf_quant_log.json" >/dev/null
     rm -rf "$work"
 }
 
@@ -256,9 +291,6 @@ case "$MODE" in
     buildtime)
         identity_check
         interfaces_check
-        index_check
-        workflow_check
-        macs_check
         ;;
     identity)
         identity_check

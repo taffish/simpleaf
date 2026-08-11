@@ -10,10 +10,10 @@ versioned chemistry and workflow registries are available offline.
 - Name: `simpleaf`
 - Command: `taf-simpleaf`
 - Kind: `tool`
-- TAFFISH version: `0.26.2-r1`
-- Container image: `ghcr.io/taffish/simpleaf:0.26.2-r1`
-- Upstream release: [`v0.26.2`](https://github.com/COMBINE-lab/simpleaf/releases/tag/v0.26.2)
-- Upstream commit: `7fbc1ad0531df03e71888ed1a3ada98a8841d630`
+- TAFFISH version: `0.27.0-r1`
+- Container image: `ghcr.io/taffish/simpleaf:0.27.0-r1`
+- Upstream release: [`v0.27.0`](https://github.com/COMBINE-lab/simpleaf/releases/tag/v0.27.0)
+- Upstream commit: `e4713d6ec2127426a0198c3e6ba1ce3dd25bd1fa`
 - Native platforms: `linux/amd64`, `linux/arm64`
 - TAFFISH app license: `Apache-2.0`
 - Upstream license: `BSD-3-Clause`
@@ -22,14 +22,14 @@ The official architecture-specific simpleaf assets are pinned by SHA256:
 
 | Platform | Release asset SHA256 |
 | --- | --- |
-| `linux/amd64` | `dcf9ce35159602c790c6a211118c7e35719f2975f6a439d2a5b23378d45076bf` |
-| `linux/arm64` | `b2328a0c38d6cd50a1e92db54ed70d3419962ce33d906db5be5d53a8ff851284` |
+| `linux/amd64` | `a50ab007e20005426d6fccb484855afbea70c9d55818e9ec5878b15f44c8d3e8` |
+| `linux/arm64` | `a275add8b54080df342ee00449114e36057e6741eb3ba36c6865fc06f090e42b` |
 
-`piscem 0.21.1` and `alevin-fry 0.16.2` are built from their checksum-pinned
+`piscem 0.22.0` and `alevin-fry 0.17.1` are built from their checksum-pinned
 official source archives with their upstream `Cargo.lock` files and Rust
 `1.96.0`. Generic CPU baselines replace upstream release tuning so the images
 run on the full declared platform baseline. On `linux/amd64`, piscem's locked
-`packed-seq 4.4.2` dependency is explicitly given its documented `scalar`
+`packed-seq 5.0.0` dependency is explicitly given its documented `scalar`
 feature; this avoids an upstream AVX2 requirement without changing dependency
 versions. The `linux/arm64` build uses the generic ARM/NEON path unchanged.
 
@@ -45,7 +45,7 @@ app directory.
 
 ## Scope
 
-The app exposes the complete simpleaf `v0.26.2` command surface:
+The app exposes the complete simpleaf `v0.27.0` command surface:
 
 - direct, probe CSV, feature CSV, splici and spliceu reference indexing
 - standard sc/snRNA-seq mapping and quantification through piscem and
@@ -56,20 +56,30 @@ The app exposes the complete simpleaf `v0.26.2` command surface:
 - local chemistry lookup, addition, removal, cleanup and resource fetching
 - Jsonnet workflow listing, export, patching, execution, resume and step control
 - optional AnnData output supported by simpleaf's built-in Rust implementation
+- shared mapping/decompression budgets with explicit decoder and thread-policy controls
+- bounded piscem index scratch/RAM controls and optional positional RAD output
+- explicit tiny-cell thresholds and sample-barcode orientation for multiplex assays
 
 Simpleaf workflows may name arbitrary external commands. The image provides
 the simpleaf RNA/ATAC stack and common shell/download utilities, but it cannot
 anticipate every executable named by a custom or future workflow template.
 
+Version 0.27.0 requires piscem 0.22.0 or newer and alevin-fry 0.17.0 or newer;
+`set-paths` now rejects older binaries. This image uses alevin-fry 0.17.1 so
+`--small-thresh` is honored rather than merely parsed. The `--threads` budget
+now covers gzip decoding and mapping together. Index builds default to an
+8 GiB `--ram-limit-gib`; override it and `--tmp-dir` explicitly for local HPC
+scratch policies.
+
 ## Container Contents
 
 | Component | Version or snapshot | Purpose |
 | --- | --- | --- |
-| `simpleaf` | `0.26.2` | Orchestration, reference construction and registries |
-| `piscem` | `0.21.1` | RNA/ATAC index construction and mapping |
-| `alevin-fry` | `0.16.2` | Barcode correction, RAD processing and quantification |
+| `simpleaf` | `0.27.0` | Orchestration, reference construction and registries |
+| `piscem` | `0.22.0` | RNA/ATAC index construction and mapping |
+| `alevin-fry` | `0.17.1` | Barcode correction, RAD processing and quantification |
 | `macs3` | `3.0.4` | Optional ATAC peak calling |
-| Chemistry registry | simpleaf `v0.26.2` | Geometry and remote resource definitions |
+| Chemistry registry | simpleaf `v0.27.0` | Geometry and remote resource definitions |
 | Protocol estuary | commit `3476e9fceca173cf8f31e1b921bf4d6fb409eb3c` | Offline workflow templates and Jsonnet utilities |
 
 The final image contains no compiler, Cargo registry, package-manager cache,
@@ -116,7 +126,9 @@ Build an index directly from transcript or probe sequences:
 taf-simpleaf simpleaf index \
   --ref-seq transcripts.fa \
   --output index-out \
-  --threads 8
+  --threads 8 \
+  --tmp-dir local-sshash-scratch \
+  --ram-limit-gib 8
 ```
 
 Build a spliced plus intronic reference and index from a genome and annotation:
@@ -148,6 +160,8 @@ taf-simpleaf simpleaf quant \
   --reads2 sample_R2.fastq.gz \
   --output sample-quant \
   --threads 8 \
+  --decoder auto \
+  --small-thresh 0 \
   --expected-ori fw \
   --unfiltered-pl barcodes.txt \
   --resolution cr-like-em
@@ -166,7 +180,8 @@ taf-simpleaf simpleaf multiplex-quant --help
 ```
 
 This interface supports explicit or registry-derived geometry, cell and sample
-barcode lists, probe sets, reusable indexes and optional `--anndata-out`.
+barcode lists, probe sets, reusable indexes, `--sample-bc-ori`,
+`--small-thresh`, decoder controls and optional `--anndata-out`.
 
 ## scATAC-seq
 
@@ -187,8 +202,10 @@ taf-simpleaf simpleaf atac process --help
 ```
 
 The processing path uses piscem for mapping and alevin-fry for barcode and
-fragment processing. `--call-peaks` uses the bundled MACS3 `3.0.4`. Supply an
-explicit unfiltered barcode list to keep the run offline.
+fragment processing. Version 0.27.0 correctly forwards `--thr`,
+`--barcode-length`, `--decoder` and `--thread-policy`. `--call-peaks` uses the
+bundled MACS3 `3.0.4`. Supply an explicit unfiltered barcode list to keep the
+run offline.
 
 ## Chemistry And Workflows
 
@@ -291,7 +308,8 @@ The independent offline smoke suite checks:
 - offline chemistry lookup and workflow registry export
 - real direct-reference RNA and scATAC piscem index construction
 - real tiny paired-read mapping, permit-list processing, collation and RNA
-  quantification through simpleaf
+  quantification through simpleaf, including positional RAD, decoder policy
+  forwarding and explicit tiny-cell resolution
 - real manifest execution with workflow provenance logs
 - real MACS3 peak calling on deterministic BED input
 
@@ -302,10 +320,10 @@ workflow.
 ## Documentation And License
 
 - [Upstream repository](https://github.com/COMBINE-lab/simpleaf)
-- [Simpleaf documentation](https://simpleaf.readthedocs.io/en/latest/)
+- [Simpleaf documentation](https://combine-lab.github.io/simpleaf/)
 - [Alevin-fry tutorials](https://combine-lab.github.io/alevin-fry-tutorials/)
 - [Protocol estuary](https://github.com/COMBINE-lab/protocol-estuary)
-- [Release `v0.26.2`](https://github.com/COMBINE-lab/simpleaf/releases/tag/v0.26.2)
+- [Release `v0.27.0`](https://github.com/COMBINE-lab/simpleaf/releases/tag/v0.27.0)
 
 TAFFISH packaging code and documentation use Apache-2.0. Simpleaf, piscem,
 alevin-fry, MACS3 and protocol-estuary retain their upstream BSD-3-Clause

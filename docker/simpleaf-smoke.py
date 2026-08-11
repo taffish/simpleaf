@@ -30,6 +30,10 @@ seq2 = "".join(rng.choice("ACGT") for _ in range(220))
 (root / "ref.fa").write_text(f">tx1\n{seq1}\n>tx2\n{seq2}\n", encoding="ascii")
 (root / "t2g.tsv").write_text("tx1\tgeneA\ntx2\tgeneB\n", encoding="ascii")
 (root / "permit.txt").write_text("AAAAAAAAAAAAAAAA\n", encoding="ascii")
+(root / "thread-policy.json").write_text(
+    json.dumps({"parallel_decode": {"min_threads_per_stream": 8}}) + "\n",
+    encoding="ascii",
+)
 
 read1 = []
 read2 = []
