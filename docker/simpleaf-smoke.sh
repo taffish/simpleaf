@@ -5,9 +5,9 @@ SIMPLEAF=/opt/simpleaf/bin/simpleaf
 PISCEM=/opt/simpleaf/bin/piscem
 ALEVIN_FRY=/opt/simpleaf/bin/alevin-fry
 MACS3=/opt/simpleaf/macs3/bin/macs3
-EXPECTED_SIMPLEAF=0.27.0
+EXPECTED_SIMPLEAF=0.28.0
 EXPECTED_PISCEM=0.22.0
-EXPECTED_ALEVIN_FRY=0.17.1
+EXPECTED_ALEVIN_FRY=0.18.0
 EXPECTED_MACS3=3.0.4
 MODE=${1:-}
 TMP_ROOT=${2:-/tmp}
@@ -51,21 +51,27 @@ identity_check() {
         fail "unexpected alevin-fry version"
     "$MACS3" --version 2>&1 | grep -F "$EXPECTED_MACS3" >/dev/null
     RUST_LOG=warn "$SIMPLEAF" inspect >"${TMP_ROOT%/}/simpleaf-inspect-$$.json" 2>&1
-    grep -F '"simpleaf_version": "0.27.0"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
+    grep -F '"simpleaf_version": "0.28.0"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
     grep -F '"version": "0.22.0"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
-    grep -F '"version": "0.17.1"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
+    grep -F '"version": "0.18.0"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
     grep -F '"version": "3.0.4"' "${TMP_ROOT%/}/simpleaf-inspect-$$.json" >/dev/null
-    grep -Fx 'upstream_commit=e4713d6ec2127426a0198c3e6ba1ce3dd25bd1fa' \
+    grep -Fx 'upstream_commit=02851cc02a8bbad6ea84035b38b93555d694d2ec' \
         /opt/simpleaf/share/doc/simpleaf/source.txt >/dev/null
-    grep -Fx 'linux_amd64_asset_sha256=a50ab007e20005426d6fccb484855afbea70c9d55818e9ec5878b15f44c8d3e8' \
+    grep -Fx 'linux_amd64_asset_sha256=9fc55a8472a4a6ca3fb5f9d93cb836744e9a9db5337a24fd57c03a487702cc38' \
         /opt/simpleaf/share/doc/simpleaf/source.txt >/dev/null
-    grep -Fx 'linux_arm64_asset_sha256=a275add8b54080df342ee00449114e36057e6741eb3ba36c6865fc06f090e42b' \
+    grep -Fx 'linux_arm64_asset_sha256=8cb38756363f4ce819747fd0a7415a95a8a59fbad1a32527bf5a575ed70e38a9' \
+        /opt/simpleaf/share/doc/simpleaf/source.txt >/dev/null
+    grep -Fx 'source_archive_sha256=6291a33bf2c4a624ec9e07810dda18e48b7160d0cf4c6fb954aad55c593cfb7e' \
         /opt/simpleaf/share/doc/simpleaf/source.txt >/dev/null
     grep -Fx 'chemistry_registry_sha256=85d4ec8918f971787a28f59e05a037930f0090086bd7f406cbc3fc8d145ccc35' \
         /opt/simpleaf/share/doc/simpleaf/source.txt >/dev/null
     grep -Fx 'protocol_estuary_commit=3476e9fceca173cf8f31e1b921bf4d6fb409eb3c' \
         /opt/simpleaf/share/doc/simpleaf/source.txt >/dev/null
-    grep -Fx 'upstream_version=0.17.1' \
+    grep -Fx 'upstream_version=0.18.0' \
+        /opt/simpleaf/share/doc/alevin-fry/source.txt >/dev/null
+    grep -Fx 'upstream_commit=85d0732413c7fc6352fb55c4a7c151f1a07c29e2' \
+        /opt/simpleaf/share/doc/alevin-fry/source.txt >/dev/null
+    grep -Fx 'source_archive_sha256=fe926aa37f937d25c62e2766ddeec3ad31d7567378ae135ce6ad411668a7475c' \
         /opt/simpleaf/share/doc/alevin-fry/source.txt >/dev/null
     grep -Fx 'runtime_source=official source archive build' \
         /opt/simpleaf/share/doc/alevin-fry/source.txt >/dev/null
@@ -142,9 +148,19 @@ interfaces_check() {
     check_help '--thread-policy' "$SIMPLEAF" quant
     check_help '--with-position' "$SIMPLEAF" quant
     check_help '--small-thresh' "$SIMPLEAF" quant
+    check_help '--cell-bc-correction' "$SIMPLEAF" quant
+    check_help '--cell-bc-neighborhood' "$SIMPLEAF" quant
+    check_help '--cell-bc-confidence' "$SIMPLEAF" quant
+    check_help '--collate-memory-limit' "$SIMPLEAF" quant
     check_help '--sample-bc-list' "$SIMPLEAF" multiplex-quant
     check_help '--sample-bc-ori' "$SIMPLEAF" multiplex-quant
     check_help '--small-thresh' "$SIMPLEAF" multiplex-quant
+    check_help '--sample-bc-correction' "$SIMPLEAF" multiplex-quant
+    check_help '--sample-bc-neighborhood' "$SIMPLEAF" multiplex-quant
+    check_help '--sample-bc-confidence' "$SIMPLEAF" multiplex-quant
+    check_help '--gpl-memory-limit' "$SIMPLEAF" multiplex-quant
+    check_help '--gpl-tmp-dir' "$SIMPLEAF" multiplex-quant
+    check_help '--collate-memory-limit' "$SIMPLEAF" multiplex-quant
     check_help 'lookup' "$SIMPLEAF" chemistry
     check_help 'process' "$SIMPLEAF" atac
     check_help '--work-dir' "$SIMPLEAF" atac index
@@ -153,6 +169,9 @@ interfaces_check() {
     check_help '--decoder' "$SIMPLEAF" atac process
     check_help '--thread-policy' "$SIMPLEAF" atac process
     check_help '--barcode-length' "$SIMPLEAF" atac process
+    check_help '--cell-bc-correction' "$SIMPLEAF" atac process
+    check_help '--cell-bc-neighborhood' "$SIMPLEAF" atac process
+    check_help '--cell-bc-confidence' "$SIMPLEAF" atac process
     check_help 'patch' "$SIMPLEAF" workflow
     check_help '--manifest' "$SIMPLEAF" workflow run
     check_help 'map-sc' "$PISCEM"
@@ -236,6 +255,10 @@ quant_check() {
         --decoder serial \
         --thread-policy "$work/thread-policy.json" \
         --with-position \
+        --cell-bc-correction frequency \
+        --cell-bc-neighborhood hamming-1 \
+        --cell-bc-confidence 39/40 \
+        --collate-memory-limit 256MiB \
         --small-thresh 0 \
         --resolution cr-like \
         --dict tiny
@@ -243,6 +266,7 @@ quant_check() {
     test -s "$work/quant/af_quant/alevin/quants_mat.mtx"
     test -s "$work/quant/af_quant/alevin/quants_mat_rows.txt"
     test -s "$work/quant/af_quant/alevin/quants_mat_cols.txt"
+    test -s "$work/quant/af_quant/correction_plan.bin"
     test -s "$work/quant/simpleaf_quant_log.json"
     grep -Fx 'AAAAAAAAAAAAAAAA' "$work/quant/af_quant/alevin/quants_mat_rows.txt" >/dev/null
     grep -Fx 'geneA' "$work/quant/af_quant/alevin/quants_mat_cols.txt" >/dev/null
@@ -252,6 +276,11 @@ quant_check() {
     grep -F -- '--decoder serial' "$work/quant/simpleaf_quant_log.json" >/dev/null
     grep -F -- '--with-position' "$work/quant/simpleaf_quant_log.json" >/dev/null
     grep -F -- '--small-thresh 0' "$work/quant/simpleaf_quant_log.json" >/dev/null
+    grep -F -- '--cell-bc-correction frequency' "$work/quant/simpleaf_quant_log.json" >/dev/null
+    grep -F -- '--cell-bc-neighborhood hamming-1' "$work/quant/simpleaf_quant_log.json" >/dev/null
+    grep -F -- '--cell-bc-confidence 39/40' "$work/quant/simpleaf_quant_log.json" >/dev/null
+    grep -F -- '--memory-limit 256MiB' "$work/quant/simpleaf_quant_log.json" >/dev/null
+    grep -F -- '-t 2' "$work/quant/simpleaf_quant_log.json" >/dev/null
     rm -rf "$work"
 }
 

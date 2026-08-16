@@ -1,0 +1,6 @@
+{
+  "artifact": "taf-simpleaf-v0.28.0-r1",
+  "schema": "taffish.build/v1",
+  "source_sha256": "8c4477d9d32b7b87c6fc03d207499c99d29af7ea0a8a2e326a4c4ba8fdd90c32",
+  "wrapper_sha256": "98e0fa0827199aacc6a660d59ab27add626a2af99fd0c38ad9bd8893ad005008"
+}

@@ -1,7 +1,7 @@
 [package]
 name = "simpleaf"
 kind = "tool"
-version = "0.27.0"
+version = "0.28.0"
 release = 1
 license = "Apache-2.0"
 main = "src/main.taf"
@@ -17,7 +17,7 @@ pipe = true
 command_mode = true
 
 [container]
-image = "ghcr.io/taffish/simpleaf:0.27.0-r1"
+image = "ghcr.io/taffish/simpleaf:0.28.0-r1"
 dockerfile = "docker/Dockerfile"
 build_platforms = "linux/amd64,linux/arm64"
 
@@ -25,7 +25,7 @@ build_platforms = "linux/amd64,linux/arm64"
 domain = "bio"
 categories = ["single-cell", "single-nucleus", "transcriptomics", "chromatin-accessibility", "workflow"]
 keywords = ["simpleaf", "piscem", "alevin-fry", "MACS3", "scRNA-seq", "snRNA-seq", "scATAC-seq", "10x", "barcode", "UMI", "quantification", "multiplex"]
-description = "Simpleaf 0.27.0 with pinned piscem, alevin-fry, MACS3, chemistry/workflow registries, bounded index resources, adaptive decoding controls, positional RAD support, and single-cell RNA-seq/ATAC-seq processing."
+description = "Simpleaf 0.28.0 with pinned piscem, alevin-fry, MACS3, offline registries, deterministic barcode correction controls, bounded stage resources, and single-cell RNA-seq/ATAC-seq processing."
 
 [upstream]
 name = "simpleaf"
@@ -33,10 +33,10 @@ type = "github"
 repo = "COMBINE-lab/simpleaf"
 homepage = "https://combine-lab.github.io/simpleaf/"
 manual = "https://combine-lab.github.io/simpleaf/"
-release_url = "https://github.com/COMBINE-lab/simpleaf/releases/tag/v0.27.0"
-downloads = "https://github.com/COMBINE-lab/simpleaf/releases/download/v0.27.0/simpleaf-x86_64-unknown-linux-gnu.tar.xz; https://github.com/COMBINE-lab/simpleaf/releases/download/v0.27.0/simpleaf-aarch64-unknown-linux-gnu.tar.xz; https://github.com/COMBINE-lab/simpleaf/releases/download/v0.27.0/source.tar.gz"
-version = "0.27.0"
-commit = "e4713d6ec2127426a0198c3e6ba1ce3dd25bd1fa"
+release_url = "https://github.com/COMBINE-lab/simpleaf/releases/tag/v0.28.0"
+downloads = "https://github.com/COMBINE-lab/simpleaf/releases/download/v0.28.0/simpleaf-x86_64-unknown-linux-gnu.tar.xz; https://github.com/COMBINE-lab/simpleaf/releases/download/v0.28.0/simpleaf-aarch64-unknown-linux-gnu.tar.xz; https://github.com/COMBINE-lab/simpleaf/releases/download/v0.28.0/source.tar.gz"
+version = "0.28.0"
+commit = "02851cc02a8bbad6ea84035b38b93555d694d2ec"
 license = "BSD-3-Clause"
 description = "A Rust framework that orchestrates reference construction, piscem mapping, alevin-fry quantification, multiplex assays, scATAC-seq processing, chemistry registries, and reusable workflows."
 watch = "tags"
